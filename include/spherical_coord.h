@@ -2,10 +2,9 @@
 #define SPHERICAL_COORD_H
 
 #include "cartesian_coord.h"
+#include "constants.h"
 #include <math.h>
 #include <iostream>
-
-#define PI 3.14159265359
 
 class cartesian_coord;
 

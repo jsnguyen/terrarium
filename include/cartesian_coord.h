@@ -2,10 +2,9 @@
 #define CARTESIAN_COORD_H
 
 #include "spherical_coord.h"
+#include "constants.h"
 #include <math.h>
 #include <iostream>
-
-#define PI 3.14159265359
 
 struct halo_t;
 class spherical_coord;

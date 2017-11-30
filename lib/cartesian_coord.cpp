@@ -1,4 +1,4 @@
-#include "cartesian_coord.h"
+#include "../include/cartesian_coord.h"
 
 cartesian_coord::cartesian_coord(): x(0), y(0), z(0)
 {

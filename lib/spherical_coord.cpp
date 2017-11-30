@@ -1,4 +1,4 @@
-#include "spherical_coord.h"
+#include "../include/spherical_coord.h"
 
 //by default a unit vector pointing in positive-z axis
 spherical_coord::spherical_coord():
