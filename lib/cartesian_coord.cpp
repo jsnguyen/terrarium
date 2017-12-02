@@ -44,7 +44,6 @@ void cartesian_coord::set(double a, double b, double c){
   return;
 }
 
-
 void cartesian_coord::set_x(double new_x){
   x = new_x;
   return;
