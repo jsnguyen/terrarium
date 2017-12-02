@@ -9,44 +9,65 @@ cartesian_coord calc_gravitational_acceleration(protoplanetary_object a, protopl
   return r_hat*acc;
 }
 
-protoplanetary_object calc_position(protoplanetary_object a, std::vector<protoplanetary_object> b, double t_step){
+protoplanetary_object calc_position(protoplanetary_object a, protoplanetary_object b, double t_step){
 
   cartesian_coord p_vec;
   cartesian_coord acc;
   cartesian_coord new_pos, new_vel, new_acc;
 
-  //double new_pos_x,new_pos_y,new_pos_z;
-  //double new_vel_x,new_vel_y,new_vel_z;
-
   acc.set_zero();
-  for (int i=0; i<b.size(); i++){
-    acc=calc_gravitational_acceleration(a,b[i])+acc;
-    std::cout <<acc<<std::endl;
-  }
-
-
-  //new_pos_x=a.get_position().get_x() + a.get_velocity().get_x()*t_step + 0.5*acc.get_x()*t_step*t_step;
-  //new_pos_y=a.get_position().get_y() + a.get_velocity().get_y()*t_step + 0.5*acc.get_y()*t_step*t_step;
-  //new_pos_z=a.get_position().get_z() + a.get_velocity().get_z()*t_step + 0.5*acc.get_z()*t_step*t_step;
+  acc=calc_gravitational_acceleration(a,b);
 
   new_pos=a.get_position() + a.get_velocity()*t_step + acc*0.5*t_step*t_step;
-
   a.set_position(new_pos);
 
   new_acc.set_zero();
-  for (int i=0; i<b.size(); i++){
-    new_acc=calc_gravitational_acceleration(a,b[i])+new_acc;
-  }
-
-  //new_vel_x=a.get_velocity().get_x() + 0.5*(acc.get_x()+new_acc.get_x())*t_step;
-  //new_vel_y=a.get_velocity().get_y() + 0.5*(acc.get_y()+new_acc.get_y())*t_step;
-  //new_vel_z=a.get_velocity().get_z() + 0.5*(acc.get_z()+new_acc.get_z())*t_step;
+  new_acc=calc_gravitational_acceleration(a,b);
 
   new_vel=a.get_velocity() + (acc+new_acc)*0.5*t_step;
   a.set_velocity(new_vel);
 
-
-  //a.set_velocity(new_vel_x,new_vel_y,new_vel_z);
-
   return a;
+}
+
+cartesian_coord calc_circular_orbit_velocity(cartesian_coord pos_a, cartesian_coord pos_b, double mass){
+  cartesian_coord vel;
+  cartesian_coord r_vec = (pos_b-pos_a);
+  cartesian_coord r_hat = r_vec.normalize();
+  cartesian_coord v_hat(-r_hat.get_y(),r_hat.get_x(),r_hat.get_z());
+  double mag_vel;
+
+  mag_vel = sqrt(G_nsi*mass*em_to_kg/r_vec.magnitude());
+
+  vel = v_hat*mag_vel;
+
+  return vel;
+}
+
+void clear_file(const std::string& filename){
+  std::ofstream output;
+  output.open(filename);
+  output.close();
+
+}
+void take_snapshot(const std::string& filename, std::vector<protoplanetary_object> a){
+  std::ofstream output;
+  std::stringstream path;
+  output.open(filename,std::fstream::app);
+
+  for(int i=0; i<a.size(); i++){
+    path << a[i].get_position();
+    if(i!=a.size()-1){
+      path << ",";
+    }
+  }
+  output << path.str() << '\n';
+  output.close();
+}
+
+void take_snapshot(const std::string& filename, protoplanetary_object a){
+  std::ofstream output;
+  output.open(filename,std::fstream::app);
+  output << a.get_position() << '\n';
+  output.close();
 }
