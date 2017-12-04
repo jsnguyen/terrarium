@@ -118,6 +118,17 @@ cartesian_coord cartesian_coord::sep_projection(cartesian_coord b) const{
   return p_sep;
 }
 
+void cartesian_coord::rotate_about_z(double angle){
+  //radians
+  double new_x, new_y;
+
+  new_x = x*cos(angle) - y*sin(angle);
+  new_y = x*sin(angle) + y*cos(angle);
+
+  x=new_x;
+  y=new_y;
+}
+
 spherical_coord cartesian_coord::cart_to_sph() const{
 
   const cartesian_coord a(x,y,z);

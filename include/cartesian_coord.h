@@ -43,6 +43,8 @@ class cartesian_coord{
     cartesian_coord projection(cartesian_coord b) const;
     cartesian_coord sep_projection(cartesian_coord b) const;
 
+    void rotate_about_z(double);
+
     spherical_coord cart_to_sph() const;
 
   private:

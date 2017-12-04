@@ -24,11 +24,15 @@ with open(filename) as f:
             bodies[bodies[i].id].y.append(float(el[1]))
             bodies[bodies[i].id].z.append(float(el[2]))
 
+bodies=bodies[1:] #remove sun
 plt.figure(figsize=(5,5))
 bounds=1.3*au_to_km
 plt.xlim(-bounds,bounds)
 plt.ylim(-bounds,bounds)
 for el in bodies:
     plt.plot(el.x,el.y,marker='',linestyle='--')
+    plt.scatter(el.x[-1],el.y[-1])
+
+plt.scatter(0,0, label='Host Star', color='black',marker='*')
 #plt.plot(bodies[0].x,bodies[1].y,marker='',linestyle='--')
 plt.show()

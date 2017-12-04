@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 
 cartesian_coord calc_gravitational_acceleration(protoplanetary_object, protoplanetary_object);
 protoplanetary_object calc_position(protoplanetary_object, std::vector<protoplanetary_object>, double);
@@ -23,6 +24,7 @@ void take_snapshot(const std::string& ,std::vector<protoplanetary_object>);
 void take_snapshot(const std::string& ,protoplanetary_object);
 bool is_file_exist(const std::string&);
 double calc_semimajor_axis(cartesian_coord, cartesian_coord, double);
+double vis_viva(cartesian_coord, double,double);
 void write_orbital_parameters(const std::string&, std::vector<protoplanetary_object>);
 cartesian_coord calc_eccentricity_vector(cartesian_coord, cartesian_coord, double);
 double calc_rotation_angle(cartesian_coord);

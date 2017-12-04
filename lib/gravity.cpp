@@ -57,7 +57,7 @@ cartesian_coord calc_circular_orbit_velocity(cartesian_coord pos_a, cartesian_co
 double bounded_rand(double lower_lim, double upper_lim){
 
   double random = ((double) rand()) / (double) RAND_MAX;
-  double diff = lower_lim - upper_lim;
+  double diff = upper_lim - lower_lim;
   double r = (random * diff)+lower_lim;
 
   return r;
@@ -121,6 +121,13 @@ double calc_semimajor_axis(cartesian_coord r, cartesian_coord v,double mass){
   return a;
 }
 
+double vis_viva(cartesian_coord r, double a,double mass){
+  double v;
+  mass=mass*em_to_kg;
+  v=sqrt(G_nsi*mass*( (2/r.magnitude()) - (1/a) ));
+  return v;
+}
+
 void write_orbital_parameters(const std::string& filename, std::vector<protoplanetary_object> bodies){
   std::ofstream orbit_output;
   orbit_output.open(filename,std::fstream::app);
@@ -146,8 +153,7 @@ cartesian_coord calc_eccentricity_vector(cartesian_coord r, cartesian_coord v, d
 
 double calc_rotation_angle(cartesian_coord e){
   double angle;
-  cartesian_coord a(1,0,0);
-  e=e*-1;
-  angle=e.get_angle(a);
+  e=e*-1; //eccentricity vector points the opposite way we want
+  angle=atan2(e.get_y(), e.get_x());
   return angle;
 }

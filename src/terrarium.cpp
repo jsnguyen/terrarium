@@ -7,7 +7,6 @@
 #include <sstream>
 #include <cstdlib>
 #include <cassert>
-
 #include <iomanip>
 #include <cmath>
 
@@ -19,6 +18,8 @@ int main(int argc, char *argv[]){
   double a_LOWER_LIM,a_UPPER_LIM,e_LOWER_LIM,e_UPPER_LIM;
   const int N_PARAMS=9;
 
+
+  //reading in config file (make this cleaner/better)
   string CONFIG_FILENAME="./data/config.txt";
   ifstream config_file;
   config_file.open(CONFIG_FILENAME);
@@ -63,6 +64,7 @@ int main(int argc, char *argv[]){
   }
   while(line=="" || line.find('#')!=string::npos);
 
+  //read through special bodies
   vector<double> sb;
   for(int i=0; i<N_SPECIAL_BODY; i++){
     assert(line=="/START");
@@ -75,16 +77,18 @@ int main(int argc, char *argv[]){
   config_file.close();
 
   cartesian_coord pos,pos_hat,vel;
-  double pos_mag,eccentricity,semimajor_axis;
+  double pos_mag,eccentricity,semimajor_axis,semiminor_axis,foci_dist,ellipse_angle,angle;
   double mass;
   cartesian_coord pos_zero(0,0,0);
   cartesian_coord vel_zero(0,0,0);
   vector<protoplanetary_object> bodies;
 
+  //initialize sun/host star
   protoplanetary_object sun;
   sun.set(0,695700,333043,pos_zero,vel_zero,0);
   bodies.push_back(sun);
 
+  //initialize special bodies
   protoplanetary_object special_body;
   for(int i=0; i<N_SPECIAL_BODY; i++){
     pos.set(sb[2+(i*9)],sb[3+(i*9)],sb[4+(i*9)]);
@@ -93,33 +97,54 @@ int main(int argc, char *argv[]){
     bodies.push_back(special_body);
   }
 
-  /*
-  pos.set(1*au_to_km,0,0);
-  vel=calc_circular_orbit_velocity(pos_zero, pos, sun.get_mass());
-  protoplanetary_object earth(1,6371,1,pos,vel,0);
-  bodies.push_back(earth);
-  */
+  srand(SEED); //set in config file, change every run
+  cartesian_coord neg_zaxis(0,0,-1);
+  cartesian_coord pos_center_ellipse;
 
-  srand(SEED);
-
+  // initialize protoplanetary objects
+  // skip special bodies
   for(int i=N_SPECIAL_BODY;i<N_PLANETARY_EMBRYO; i++){
-    eccentricity=bounded_rand(e_LOWER_LIM*au_to_km,e_UPPER_LIM*au_to_km);
-    pos_mag=bounded_rand(a_LOWER_LIM*au_to_km,a_UPPER_LIM*au_to_km);
-    pos_hat=xy_random_direction();
+    //variables that are being sampled
+    eccentricity=bounded_rand(e_LOWER_LIM,e_UPPER_LIM);
+    semimajor_axis=bounded_rand(a_LOWER_LIM*au_to_km,a_UPPER_LIM*au_to_km);
+    angle=bounded_rand(0,2*PI);
 
-    pos=pos_hat*pos_mag;
+    //find the magnitude of the position vector
+    pos_mag=semimajor_axis*(1-(eccentricity*eccentricity)) / (1+(eccentricity*cos(angle))); //equation of ellipse where origin is the focus
 
+    //find distance between foci and center of ellipse
+    semiminor_axis = sqrt(1-eccentricity*eccentricity)*semimajor_axis;
+    foci_dist = sqrt(semimajor_axis*semimajor_axis - semiminor_axis*semiminor_axis);
+
+
+
+    // translate x by 2 times the foci dist to move the origin to the other focus
+    pos.set(pos_mag*cos(angle)+(2*foci_dist),pos_mag*sin(angle),0);
+
+    //randomly sample rotation of ellipse around sun
+    ellipse_angle=bounded_rand(0,2*PI);
+    pos.rotate_about_z(ellipse_angle);
+
+    //dummy ellipse with origin at center to calculate velocity
+    //velocity is always tangent to position vector that has its origin at center of ellipse
+    pos_center_ellipse.set(pos_mag*cos(angle)+foci_dist,pos_mag*sin(angle),0);
+    vel=pos_center_ellipse.crossProd(neg_zaxis).normalize() * vis_viva(pos,semimajor_axis,bodies[0].get_mass());
+    vel.rotate_about_z(ellipse_angle); //also gotta rotate velocity
+
+    //randomly sample mass
     mass=bounded_rand(0.01,0.1);
 
-    vel=calc_circular_orbit_velocity(pos_zero, pos, sun.get_mass());
+    //make object
     protoplanetary_object p(i+1,mass,1,pos,vel,0);
     bodies.push_back(p);
   }
 
+  //files we are writing out to
   string path_output_file= "./data/path.txt";
   string initial_orbit_output_file= "./data/initial_orbit.txt";
   string final_orbit_output_file= "./data/final_orbit.txt";
 
+  //checking to make sure no overwriting files
   char reply;
   if (is_file_exist(path_output_file) || is_file_exist(initial_orbit_output_file) || is_file_exist(final_orbit_output_file) ){
 
@@ -141,29 +166,32 @@ int main(int argc, char *argv[]){
     cout << "Writing to new file..." << endl;
   }
 
+
   clear_file(path_output_file);
   clear_file(initial_orbit_output_file);
   clear_file(final_orbit_output_file);
   make_header(path_output_file,bodies.size());
-
   write_orbital_parameters(initial_orbit_output_file,bodies);
 
-  double percent;
+  //integrate bodies over time
   for (int i=0; i<N_INTEGRATION_STEP; i++){
-
-    percent = (double(i)/double(N_INTEGRATION_STEP))*100;
-    if( fmod(percent,5) == 0){
-      cout << int(percent) << '%' << endl;
+    if( i%100 == 0){
+      printf("%.2f%%\n", (double(i)/double(N_INTEGRATION_STEP)*100));
     }
 
     //skip sun at j=0
     for(int j=1; j<bodies.size(); j++){
         take_snapshot(path_output_file,bodies);
         bodies[j] = calc_position(bodies[j],bodies,STEP_SIZE);
+
+        //erase bodies if it gets ejected
         if (bodies[j].get_position().magnitude()>10*au_to_km){
           bodies.erase(bodies.begin()+j);
           j--;
         }
+
+        //COLLISION CONDITIONS HERE
+
     }
   }
   cout << "100%" << endl;
