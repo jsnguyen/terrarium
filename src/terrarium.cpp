@@ -15,7 +15,7 @@ using namespace std;
 int main(int argc, char *argv[]){
 
   int SEED,N_INTEGRATION_STEP,STEP_SIZE,N_PLANETARY_EMBRYO,N_PLANETESIMAL,N_SPECIAL_BODY;
-  double a_LOWER_LIM,a_UPPER_LIM,e_LOWER_LIM,e_UPPER_LIM;
+  double a_LOWER_LIM,a_UPPER_LIM,e_LOWER_LIM,e_UPPER_LIM,mass_LOWER_LIM,mass_UPPER_LIM;
   const int N_PARAMS=9;
 
 
@@ -58,6 +58,12 @@ int main(int argc, char *argv[]){
 
   getline(config_file,line);
   e_UPPER_LIM=atof(line.substr(line.find('=')+1).c_str());
+
+  getline(config_file,line);
+  mass_LOWER_LIM=atof(line.substr(line.find('=')+1).c_str());
+
+  getline(config_file,line);
+  mass_UPPER_LIM=atof(line.substr(line.find('=')+1).c_str());
 
   do{
     getline(config_file,line);
@@ -132,7 +138,7 @@ int main(int argc, char *argv[]){
     vel.rotate_about_z(ellipse_angle); //also gotta rotate velocity
 
     //randomly sample mass
-    mass=bounded_rand(0.01,0.1);
+    mass=bounded_rand(mass_LOWER_LIM,mass_UPPER_LIM);
 
     //make object
     protoplanetary_object p(i+1,mass,1,pos,vel,0);

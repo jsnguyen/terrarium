@@ -10,18 +10,10 @@ a_LOWER_LIM=0.5
 a_UPPER_LIM=0.7
 e_LOWER_LIM=0.01
 e_UPPER_LIM=0.2
+mass_LOWER_LIM=0.01
+mass_UPPER_LIM=0.01
 # SPECIAL_BODIES
 # radius,mass,px,py,pz,vx,vy,vz,angular_momentum
-/START
-6371
-1
-0
-1.496e8
-0
--10
-0
-0
-0
 /START
 6371
 1
