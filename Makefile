@@ -9,4 +9,4 @@ terrarium:
 	$(CC) $(CFLAGS) ./$(SRC)/terrarium.cpp ./$(LIB)/cartesian_coord.cpp ./$(LIB)/spherical_coord.cpp ./$(LIB)/protoplanetary_object.cpp ./$(LIB)/constants.cpp ./$(LIB)/gravity.cpp -o terrarium.exe
 
 clean:
-	rm pair_search.exe reduced_halo_pair_finder.exe
+	rm terrarium.exe
