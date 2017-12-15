@@ -84,5 +84,4 @@ ax[1].set_xlabel('Distance (AU)')
 ax[1].set_xlim(-radius,radius)
 ax[1].set_ylim(-radius,radius)
 
-plt.savefig('vis_ex_2.png',bbox_inches='tight')
 plt.show()

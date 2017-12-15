@@ -35,5 +35,4 @@ for el in bodies:
 
 plt.scatter(0,0, label='Host Star', color='black',marker='*')
 #plt.plot(bodies[0].x,bodies[1].y,marker='',linestyle='--')
-plt.savefig('vis_ex.png',bbox_inches='tight')
 plt.show()
