@@ -6,7 +6,7 @@ LIB = lib
 all: terrarium
 
 terrarium:
-	$(CC) $(CFLAGS) ./$(SRC)/terrarium.cpp ./$(LIB)/cartesian_coord.cpp ./$(LIB)/spherical_coord.cpp ./$(LIB)/protoplanetary_object.cpp ./$(LIB)/constants.cpp ./$(LIB)/gravity.cpp -o terrarium.exe
+	$(CC) $(CFLAGS) ./$(SRC)/terrarium.cpp ./$(LIB)/cartesian_coord.cpp ./$(LIB)/spherical_coord.cpp ./$(LIB)/protoplanetary_object.cpp ./$(LIB)/constants.cpp ./$(LIB)/gravity.cpp ./$(LIB)/collisions.cpp -o terrarium.exe
 
 clean:
 	rm terrarium.exe

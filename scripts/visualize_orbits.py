@@ -9,19 +9,19 @@ au_to_km=1.496e+8;
 
 def make_orbits(name,a,e,angle):
     n=len(a)
+    print (a)
     orbits = []
     for i in range(n):
         b = np.sqrt(1-e[i]**2)*a[i]
         foci_dist = np.sqrt(a[i]**2 - b**2)
-        #print (a[i], b,foci_dist)
         foci_x = foci_dist*np.cos(angle[i])
         foci_y = foci_dist*np.sin(angle[i])
+        print (angle[i])
         c = 'C'+str(i%10)
-        print (np.rad2deg(angle[i]))
         orbits.append(mpl.patches.Ellipse(xy=[foci_x,foci_y], width=a[i]*2, height=b*2,color=c, angle=np.rad2deg(angle[i]), fill=False,label=name[i]))
     return orbits
 
-radius = 2*au_to_km
+radius = 2.1*au_to_km
 fig, ax = plt.subplots(1,2,figsize=(10, 5))
 
 filename='./data/initial_orbit.txt'
@@ -58,6 +58,7 @@ filename='./data/final_orbit.txt'
 name=[]
 a=[]
 e=[]
+angle=[]
 pos_x=[]
 pos_y=[]
 with open(filename) as f:
@@ -83,5 +84,5 @@ ax[1].set_xlabel('Distance (AU)')
 ax[1].set_xlim(-radius,radius)
 ax[1].set_ylim(-radius,radius)
 
-
+plt.savefig('vis_ex_2.png',bbox_inches='tight')
 plt.show()

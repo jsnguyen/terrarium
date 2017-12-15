@@ -1,5 +1,6 @@
 #include "../include/protoplanetary_object.h"
 #include "../include/gravity.h"
+#include "../include/collisions.h"
 
 #include <iostream>
 #include <fstream>
@@ -149,6 +150,7 @@ int main(int argc, char *argv[]){
   string path_output_file= "./data/path.txt";
   string initial_orbit_output_file= "./data/initial_orbit.txt";
   string final_orbit_output_file= "./data/final_orbit.txt";
+  string collisions_file= "./data/collisions.txt";
 
   //checking to make sure no overwriting files
   char reply;
@@ -176,9 +178,12 @@ int main(int argc, char *argv[]){
   clear_file(path_output_file);
   clear_file(initial_orbit_output_file);
   clear_file(final_orbit_output_file);
-  make_header(path_output_file,bodies.size());
+  clear_file(collisions_file);
+  write_header(path_output_file,bodies.size());
   write_orbital_parameters(initial_orbit_output_file,bodies);
 
+  vector<collisions> col;
+  collisions curr_col;
   //integrate bodies over time
   for (int i=0; i<N_INTEGRATION_STEP; i++){
     if( i%100 == 0){
@@ -187,19 +192,36 @@ int main(int argc, char *argv[]){
 
     //skip sun at j=0
     for(int j=1; j<bodies.size(); j++){
-        take_snapshot(path_output_file,bodies);
-        bodies[j] = calc_position(bodies[j],bodies,STEP_SIZE);
+      write_snapshot(path_output_file,bodies);
+      bodies[j] = calc_position(bodies[j],bodies,STEP_SIZE);
+      //erase bodies if it gets ejected
+      if (bodies[j].get_position().magnitude()>10*au_to_km){
+        bodies.erase(bodies.begin()+j);
+        j--;
+      }
+    }
+    for(int k=0; k<bodies.size()-1; k++){
+      for(int l=k+1; l<bodies.size(); l++){
+        if(k!=l){
+          if ( was_collision(bodies[k], bodies[l]) ){
+            cout << "Collision occured!" << endl;
+            curr_col = populate_collisions(bodies[k],bodies[l],i);
+            col.push_back(curr_col);
+            write_collision(collisions_file,curr_col);
 
-        //erase bodies if it gets ejected
-        if (bodies[j].get_position().magnitude()>10*au_to_km){
-          bodies.erase(bodies.begin()+j);
-          j--;
+            for(int m=1; i<bodies.size(); m++){
+              if(bodies[m].get_id()==curr_col.get_dead()){
+                bodies.erase(bodies.begin()+i);
+                break;
+              }
+            }
+
+          }
         }
-
-        //COLLISION CONDITIONS HERE
-
+      }
     }
   }
+
   cout << "100%" << endl;
 
   write_orbital_parameters(final_orbit_output_file,bodies);

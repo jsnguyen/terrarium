@@ -26,7 +26,7 @@ with open(filename) as f:
 
 bodies=bodies[1:] #remove sun
 plt.figure(figsize=(5,5))
-bounds=1.3*au_to_km
+bounds=2.1*au_to_km
 plt.xlim(-bounds,bounds)
 plt.ylim(-bounds,bounds)
 for el in bodies:
@@ -35,4 +35,5 @@ for el in bodies:
 
 plt.scatter(0,0, label='Host Star', color='black',marker='*')
 #plt.plot(bodies[0].x,bodies[1].y,marker='',linestyle='--')
+plt.savefig('vis_ex.png',bbox_inches='tight')
 plt.show()

@@ -37,6 +37,37 @@ protoplanetary_object calc_position(protoplanetary_object a, std::vector<protopl
 
   return a;
 }
+std::vector<cartesian_coord> get_positions(std::vector<protoplanetary_object> bodies){
+  std::vector<cartesian_coord> positions;
+  for(int i=0; i<bodies.size(); i++){
+    positions.push_back(bodies[i].get_position());
+  }
+  return positions;
+}
+/*
+int collision(cartesian_coord prev_pos, cartesian_coord curr_pos){
+
+  cartesian_coord p_vec;
+  cartesian_coord acc;
+  cartesian_coord new_pos, new_vel, new_acc;
+
+  double dist;
+  int n_collisions=0;
+
+  acc.set_zero();
+  for(int i=0; i<prev_pos.size(); i++){
+    for(int j=i+1; j<curr_pos.size(); j++){
+      if (prev_pos[i].get_id() != curr_pos[j].get_id()){
+        dist=(prev_pos[i].get_position()-curr_pos[j].get_position()).magnitude();
+        if (dist<4*prev_pos[i].get_radius()*curr_pos[j].get_radius()){
+          n_collisions++;
+        }
+      }
+    }
+  }
+  return n_collisions;
+}
+*/
 
 cartesian_coord calc_circular_orbit_velocity(cartesian_coord pos_a, cartesian_coord pos_b, double mass){
   cartesian_coord vel;
@@ -79,13 +110,13 @@ void clear_file(const std::string& filename){
   output.close();
 
 }
-void make_header(const std::string& filename,int N_BODIES){
+void write_header(const std::string& filename,int N_BODIES){
   std::ofstream output;
   output.open(filename,std::fstream::app);
   output << std::to_string(N_BODIES) << '\n';
   output.close();
 }
-void take_snapshot(const std::string& filename, std::vector<protoplanetary_object> a){
+void write_snapshot(const std::string& filename, std::vector<protoplanetary_object> a){
   std::ofstream output;
   std::stringstream path;
   output.open(filename,std::fstream::app);
@@ -100,7 +131,7 @@ void take_snapshot(const std::string& filename, std::vector<protoplanetary_objec
   output.close();
 }
 
-void take_snapshot(const std::string& filename, protoplanetary_object a){
+void write_snapshot(const std::string& filename, protoplanetary_object a){
   std::ofstream output;
   output.open(filename,std::fstream::app);
   output << a.get_position() << '\n';
